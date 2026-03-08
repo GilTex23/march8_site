@@ -3,4 +3,7 @@ services:
     build: .
     ports:
       - "8888:80"
+    env_file:
+      - .env
+    command: /bin/sh -c "sed -i 's/YM_COUNTER_ID/'$YM_ID'/g' /usr/share/nginx/html/index.html && nginx -g 'daemon off;'"
     restart: always

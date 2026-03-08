@@ -109,7 +109,6 @@
     </main>
 
     <script>
-        // --- 1. Генератор пожеланий ---
         const wishes = [
             "Пусть каждый день будет наполнен счастьем и любовью!",
             "Желаю весеннего настроения и ярких эмоций!",
@@ -127,73 +126,63 @@
         const wishContainer = document.getElementById('wish-container');
 
         wishBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Предотвращаем срабатывание клика по экрану (цветение)
-            
-            // Плавное исчезновение
+            e.stopPropagation();
+
             wishContainer.classList.remove('fade-in');
             wishContainer.classList.add('fade-out');
 
             setTimeout(() => {
-                // Выбор случайного пожелания
                 const randomIndex = Math.floor(Math.random() * wishes.length);
                 wishContainer.textContent = wishes[randomIndex];
-                
-                // Плавное появление
+
                 wishContainer.classList.remove('fade-out');
                 wishContainer.classList.add('fade-in');
-            }, 500); // Время должно совпадать с CSS transition
+            }, 500);
         });
 
-        // --- 2. "Цветение" при клике ---
-        // SVG иконка цветка
-        const flowerSVG = \`
+        const flowerSVG = `
             <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                 <path d="M50 10 C60 30 80 40 90 50 C80 60 60 70 50 90 C40 70 20 60 10 50 C20 40 40 30 50 10 Z" fill="#fbbf24" opacity="0.8"/>
                 <circle cx="50" cy="50" r="15" fill="#f43f5e"/>
             </svg>
-        \`;
+        `;
 
         document.addEventListener('click', (e) => {
             const flower = document.createElement('div');
             flower.className = 'bloom-flower';
             flower.innerHTML = flowerSVG;
-            flower.style.left = \`\${e.clientX}px\`;
-            flower.style.top = \`\${e.clientY}px\`;
+            flower.style.left = `${e.clientX}px`;
+            flower.style.top = `${e.clientY}px`;
             
             document.body.appendChild(flower);
 
-            // Удаляем элемент после завершения анимации
             setTimeout(() => {
                 flower.remove();
             }, 1500);
         });
 
-        // --- 3. Параллакс фона ---
         const parallaxBg = document.getElementById('parallax-bg');
-        
-        // Для десктопа (движение мыши)
+
         document.addEventListener('mousemove', (e) => {
             const x = (window.innerWidth / 2 - e.clientX) / 50;
             const y = (window.innerHeight / 2 - e.clientY) / 50;
-            parallaxBg.style.transform = \`translate(\${x}px, \${y}px)\`;
+            parallaxBg.style.transform = `translate(${x}px, ${y}px)`;
         });
 
-        // Для мобильных (гироскоп)
         if (window.DeviceOrientationEvent) {
             window.addEventListener('deviceorientation', (e) => {
-                const x = e.gamma ? e.gamma / 2 : 0; // Наклон влево/вправо
-                const y = e.beta ? (e.beta - 45) / 2 : 0; // Наклон вперед/назад
-                parallaxBg.style.transform = \`translate(\${x}px, \${y}px)\`;
+                const x = e.gamma ? e.gamma / 2 : 0;
+                const y = e.beta ? (e.beta - 45) / 2 : 0;
+                parallaxBg.style.transform = `translate(${x}px, ${y}px)`;
             });
         }
 
-        // --- 4. Падающие лепестки (Canvas) ---
         const canvas = document.getElementById('petals-canvas');
         const ctx = canvas.getContext('2d');
         
         let width, height;
         let petals = [];
-        const numPetals = 40; // Количество лепестков
+        const numPetals = 40;
 
         function resizeCanvas() {
             width = window.innerWidth;
@@ -214,22 +203,19 @@
                 this.speedX = Math.random() * 2 - 1;
                 this.rotation = Math.random() * 360;
                 this.rotationSpeed = Math.random() * 2 - 1;
-                // Нежные розовые оттенки
                 const colors = ['#ffe4e6', '#fecdd3', '#fda4af'];
                 this.color = colors[Math.floor(Math.random() * colors.length)];
             }
 
             update() {
                 this.y += this.speedY;
-                this.x += this.speedX + Math.sin(this.y / 50) * 0.5; // Легкое покачивание
+                this.x += this.speedX + Math.sin(this.y / 50) * 0.5;
                 this.rotation += this.rotationSpeed;
 
-                // Если лепесток упал за нижний край, возвращаем наверх
                 if (this.y > height + this.size) {
                     this.y = -this.size;
                     this.x = Math.random() * width;
                 }
-                // Если улетел за боковой край
                 if (this.x > width + this.size) this.x = -this.size;
                 if (this.x < -this.size) this.x = width + this.size;
             }
@@ -240,7 +226,6 @@
                 ctx.rotate((this.rotation * Math.PI) / 180);
                 
                 ctx.beginPath();
-                // Рисуем форму лепестка
                 ctx.moveTo(0, 0);
                 ctx.bezierCurveTo(this.size / 2, -this.size / 2, this.size, 0, 0, this.size);
                 ctx.bezierCurveTo(-this.size, 0, -this.size / 2, -this.size / 2, 0, 0);
@@ -253,12 +238,10 @@
             }
         }
 
-        // Инициализация лепестков
         for (let i = 0; i < numPetals; i++) {
             petals.push(new Petal());
         }
 
-        // Анимационный цикл
         function animate() {
             ctx.clearRect(0, 0, width, height);
             
